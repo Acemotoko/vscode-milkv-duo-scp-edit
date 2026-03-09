@@ -1,0 +1,144 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "watch",
+      "problemMatcher": "$tsc-watch",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "never"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "type": "npm",
+      "script": "compile",
+      "problemMatcher": ["$tsc"],
+      "group": "build"
+    },
+    {
+      "label": "切换模型: doubao-seed-2.0-code",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/switch-model.ps1",
+        "-Model",
+        "doubao-seed-2.0-code"
+      ],
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "切换模型: doubao-seed-2.0-pro",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/switch-model.ps1",
+        "-Model",
+        "doubao-seed-2.0-pro"
+      ],
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "切换模型: doubao-seed-2.0-lite",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/switch-model.ps1",
+        "-Model",
+        "doubao-seed-2.0-lite"
+      ],
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "切换模型: doubao-seed-code",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/switch-model.ps1",
+        "-Model",
+        "doubao-seed-code"
+      ],
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "切换模型: minimax-m2.5",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/switch-model.ps1",
+        "-Model",
+        "minimax-m2.5"
+      ],
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "切换模型: glm-4.7",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/switch-model.ps1",
+        "-Model",
+        "glm-4.7"
+      ],
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "切换模型: deepseek-v3.2",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/switch-model.ps1",
+        "-Model",
+        "deepseek-v3.2"
+      ],
+      "problemMatcher": [],
+      "group": "none"
+    },
+    {
+      "label": "切换模型: kimi-k2.5",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/switch-model.ps1",
+        "-Model",
+        "kimi-k2.5"
+      ],
+      "problemMatcher": [],
+      "group": "none"
+    }
+  ]
+}

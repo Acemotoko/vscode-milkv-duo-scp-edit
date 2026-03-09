@@ -1,0 +1,223 @@
+{
+  "name": "duo-scp-edit",
+  "displayName": "Duo SCP Edit",
+  "description": "Edit files on Milk-V Duo devices via SCP",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onFileSystem:duo",
+    "onCommand:duo.connect",
+    "onCommand:duo.browse",
+    "onCommand:duo.addToWorkspace",
+    "onCommand:duo.openTerminal",
+    "onCommand:duo.find",
+    "onCommand:duo.uploadLocalFile",
+    "onView:duoDevices"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "duoExplorer",
+          "title": "Remote Explorer",
+          "icon": "resources/icons/duo-explorer.svg"
+        }
+      ]
+    },
+    "views": {
+      "duoExplorer": [
+        {
+          "id": "duoDevices",
+          "name": "Devices"
+        }
+      ]
+    },
+    "commands": [{
+      "command": "duo.connect",
+      "title": "Duo: Connect to Device",
+      "category": "Duo"
+    }, {
+      "command": "duo.browse",
+      "title": "Duo: Browse Files",
+      "category": "Duo"
+    }, {
+      "command": "duo.addToWorkspace",
+      "title": "Duo: Add to Workspace",
+      "category": "Duo"
+    }, {
+      "command": "duo.openTerminal",
+      "title": "Duo: Open Terminal",
+      "category": "Duo"
+    }, {
+      "command": "duo.find",
+      "title": "Duo: Find in Files",
+      "category": "Duo"
+    }, {
+      "command": "duoDevices.addDevice",
+      "title": "Add Device",
+      "icon": "$(add)",
+      "category": "Duo"
+    }, {
+      "command": "duoDevices.connectDevice",
+      "title": "Connect",
+      "icon": "$(plug)",
+      "category": "Duo"
+    }, {
+      "command": "duoDevices.disconnectDevice",
+      "title": "Disconnect",
+      "icon": "$(circle-slash)",
+      "category": "Duo"
+    }, {
+      "command": "duoDevices.editDevice",
+      "title": "Edit Device",
+      "icon": "$(edit)",
+      "category": "Duo"
+    }, {
+      "command": "duoDevices.deleteDevice",
+      "title": "Delete Device",
+      "icon": "$(trash)",
+      "category": "Duo"
+    }, {
+      "command": "duoDevices.openTerminal",
+      "title": "Open Terminal",
+      "icon": "$(terminal)",
+      "category": "Duo"
+    }, {
+      "command": "duoDevices.mountWorkspace",
+      "title": "Mount to Workspace",
+      "icon": "$(folder-opened)",
+      "category": "Duo"
+    }, {
+      "command": "duoDevices.rebootDevice",
+      "title": "Reboot Device",
+      "icon": "$(sync)",
+      "category": "Duo"
+    }, {
+      "command": "duoDevices.refresh",
+      "title": "Refresh",
+      "icon": "$(refresh)",
+      "category": "Duo"
+    }, {
+      "command": "duo.uploadLocalFile",
+      "title": "Upload to Milk-V Duo",
+      "category": "Duo"
+    }],
+    "menus": {
+      "view/title": [
+        {
+          "command": "duoDevices.addDevice",
+          "when": "view == duoDevices",
+          "group": "navigation"
+        },
+        {
+          "command": "duoDevices.refresh",
+          "when": "view == duoDevices",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "duoDevices.connectDevice",
+          "when": "view == duoDevices && viewItem == disconnectedDevice",
+          "group": "inline@1"
+        },
+        {
+          "command": "duoDevices.disconnectDevice",
+          "when": "view == duoDevices && viewItem == connectedDevice",
+          "group": "inline@1"
+        },
+        {
+          "command": "duoDevices.editDevice",
+          "when": "view == duoDevices",
+          "group": "inline@2"
+        },
+        {
+          "command": "duoDevices.openTerminal",
+          "when": "view == duoDevices && viewItem == connectedDevice",
+          "group": "navigation@1"
+        },
+        {
+          "command": "duoDevices.mountWorkspace",
+          "when": "view == duoDevices && viewItem == connectedDevice",
+          "group": "navigation@2"
+        },
+        {
+          "command": "duoDevices.rebootDevice",
+          "when": "view == duoDevices && viewItem == connectedDevice",
+          "group": "navigation@3"
+        },
+        {
+          "command": "duoDevices.connectDevice",
+          "when": "view == duoDevices && viewItem == disconnectedDevice",
+          "group": "navigation@1"
+        },
+        {
+          "command": "duoDevices.editDevice",
+          "when": "view == duoDevices",
+          "group": "navigation@4"
+        },
+        {
+          "command": "duoDevices.deleteDevice",
+          "when": "view == duoDevices",
+          "group": "navigation@5"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "duo.uploadLocalFile",
+          "when": "resourceScheme == file",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Duo SCP Edit",
+      "properties": {
+        "duo.host": {
+          "type": "string",
+          "default": "192.168.31.63",
+          "description": "Milk-V Duo IP address"
+        },
+        "duo.username": {
+          "type": "string",
+          "default": "root",
+          "description": "SSH username"
+        },
+        "duo.password": {
+          "type": "string",
+          "default": "",
+          "description": "SSH password"
+        },
+        "duo.port": {
+          "type": "number",
+          "default": 22,
+          "description": "SSH port"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/ssh2": "^1.15.0",
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "node-scp": "^0.0.23",
+    "ssh2": "^1.15.0",
+    "tmp-promise": "^3.0.3"
+  }
+}
