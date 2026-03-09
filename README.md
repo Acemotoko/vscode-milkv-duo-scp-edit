@@ -1,5 +1,7 @@
 ﻿# Duo SCP Edit
 
+English | [简体中文](./README.zh-CN.md)
+
 A VS Code extension for editing files on **Milk-V Duo** devices over pure **SSH/SCP-style streams** (no SFTP dependency).
 
 [![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.80-007ACC)](https://code.visualstudio.com/)
@@ -217,3 +219,4 @@ Recommended PR checklist:
 ## License
 
 MIT
+
