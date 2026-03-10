@@ -1,8 +1,8 @@
-﻿{
+{
   "name": "duo-scp-edit",
   "displayName": "Duo SCP Edit",
   "description": "Edit files on Milk-V Duo devices via SCP",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "acemotoko",
   "license": "MIT",
   "repository": {
