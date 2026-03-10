@@ -90,10 +90,10 @@ Remote Device (Milk-V Duo)
 
 ## 安装
 
-### 方式 A：安装 VSIX
-1. 构建 VSIX 包
+### 方式 A：从 GitHub Releases 安装 VSIX（推荐）
+1. 打开 [Releases](../../releases) 页面并下载最新 `.vsix` 资源文件。
 2. 在 VS Code 中打开 `Extensions` -> `...` -> `Install from VSIX...`
-3. 选择 `duo-scp-edit-<version>.vsix`
+3. 选择下载好的 `duo-scp-edit-<version>.vsix`。
 
 ### 方式 B：开发模式
 ```bash
@@ -198,6 +198,25 @@ resources/
   icons/
 ```
 
+## 发布自动化
+
+仓库已内置 GitHub Actions 工作流：`.github/workflows/release-vsix.yml`。
+
+触发规则：
+- 推送匹配 `v*` 的 tag（例如：`v0.1.0`）
+
+自动执行内容：
+- 使用 `npm ci` 安装依赖
+- 使用 `npm run compile` 编译扩展
+- 使用 `vsce` 打包 `.vsix`
+- 自动创建 GitHub Release 并上传 VSIX 资源
+
+快速发布示例：
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
 ## 路线图
 
 - 多设备并发会话支持
@@ -217,3 +236,4 @@ resources/
 ## 许可证
 
 MIT
+

@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+﻿import * as vscode from 'vscode';
 import * as path from 'path';
 import { ConnectionManager } from './ConnectionManager';
 import { DuoFileSystemProvider } from './DuoFileSystemProvider';
@@ -54,7 +54,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // If there are recent connections, show them first
     if (recentConnections.length > 0) {
       const items: vscode.QuickPickItem[] = [
-        { label: '$(plus) 输入新连接...', description: '', detail: '手动输入连接信息' }
+        { label: '$(plus) 杈撳叆鏂拌繛鎺?..', description: '', detail: '鎵嬪姩杈撳叆杩炴帴淇℃伅' }
       ];
 
       for (const conn of recentConnections) {
@@ -63,21 +63,21 @@ export async function activate(context: vscode.ExtensionContext) {
         items.push({
           label: conn.host,
           description: `(${conn.username})`,
-          detail: `上次连接: ${timeAgo}`
+          detail: `涓婃杩炴帴: ${timeAgo}`
         });
       }
 
       const selected = await vscode.window.showQuickPick(items, {
-        title: '选择设备连接',
-        placeHolder: '选择最近连接的设备或输入新连接'
+        title: '閫夋嫨璁惧杩炴帴',
+        placeHolder: '閫夋嫨鏈€杩戣繛鎺ョ殑璁惧鎴栬緭鍏ユ柊杩炴帴'
       });
 
       if (!selected) {
         return;
       }
 
-      // If user selected "输入新连接", continue to manual input
-      if (!selected.detail?.startsWith('上次连接:')) {
+      // If user selected "杈撳叆鏂拌繛鎺?, continue to manual input
+      if (!selected.detail?.startsWith('涓婃杩炴帴:')) {
         await showManualConnectDialog(connectionManager, config);
         return;
       }
@@ -96,7 +96,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const browseCommand = vscode.commands.registerCommand('duo.browse', async () => {
     if (!connectionManager.isConnected) {
-      vscode.window.showErrorMessage('Not connected. Please run "Duo: Connect to Device" first.');
+      vscode.window.showErrorMessage('Please select a file or folder in Explorer first.');
       return;
     }
 
@@ -135,7 +135,7 @@ export async function activate(context: vscode.ExtensionContext) {
     );
 
     if (!added) {
-      vscode.window.showErrorMessage('Failed to mount workspace');
+      vscode.window.showErrorMessage('Please select a file or folder in Explorer first.');
     }
     // Don't show success message - Extension Host will restart anyway
   });
@@ -163,7 +163,7 @@ export async function activate(context: vscode.ExtensionContext) {
     terminal.show();
   });
 
-  // 注册搜索功能
+  // 娉ㄥ唽鎼滅储鍔熻兘
   const searchContentProvider = new DuoSearchContentProvider();
   const searchContentProviderRegistration = vscode.workspace.registerTextDocumentContentProvider(
     SEARCH_SCHEME,
@@ -181,31 +181,30 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const uploadLocalFileCommand = vscode.commands.registerCommand('duo.uploadLocalFile', async (uri: vscode.Uri) => {
     if (!uri) {
-      vscode.window.showErrorMessage('请先在文件资源管理器中选择一个文件或文件夹');
+      vscode.window.showErrorMessage('Please select a file or folder in Explorer first.');
       return;
     }
 
     const localPath = uri.fsPath;
     const fileName = path.basename(localPath);
 
-    // 检查连接状态
-    if (!connectionManager.isConnected) {
+    // 妫€鏌ヨ繛鎺ョ姸鎬?    if (!connectionManager.isConnected) {
       const connectChoice = await vscode.window.showWarningMessage(
-        '未连接到设备。请先连接 Milk-V Duo 设备',
-        '连接设备',
-        '取消'
+        '鏈繛鎺ュ埌璁惧銆傝鍏堣繛鎺?Milk-V Duo 璁惧',
+        '杩炴帴璁惧',
+        '鍙栨秷'
       );
-      if (connectChoice === '连接设备') {
+      if (connectChoice === '杩炴帴璁惧') {
         await vscode.commands.executeCommand('duo.connect');
       }
       return;
     }
 
-    // 询问远程目标路径
+    // 璇㈤棶杩滅▼鐩爣璺緞
     const remotePath = await vscode.window.showInputBox({
-      prompt: '上传到远程设备的路径',
+      prompt: '涓婁紶鍒拌繙绋嬭澶囩殑璺緞',
       value: `/root/${fileName}`,
-      placeHolder: '例如: /root/myfile.txt 或 /root/myfolder',
+      placeHolder: '渚嬪: /root/myfile.txt 鎴?/root/myfolder',
       ignoreFocusOut: true
     });
 
@@ -213,23 +212,23 @@ export async function activate(context: vscode.ExtensionContext) {
       return;
     }
 
-    // 执行上传
+    // 鎵ц涓婁紶
     try {
       await vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
-        title: `正在上传 ${fileName} 到 Milk-V Duo...`,
+        title: `姝ｅ湪涓婁紶 ${fileName} 鍒?Milk-V Duo...`,
         cancellable: false
       }, async () => {
         await connectionManager.uploadPath(localPath, remotePath);
       });
 
-      vscode.window.showInformationMessage(`上传成功: ${fileName} → ${remotePath}`);
+      vscode.window.showInformationMessage(`涓婁紶鎴愬姛: ${fileName} 鈫?${remotePath}`);
     } catch (err: any) {
-      vscode.window.showErrorMessage(`上传失败: ${err.message}`);
+      vscode.window.showErrorMessage(`涓婁紶澶辫触: ${err.message}`);
     }
   });
 
-  // 监听文档打开事件，处理 URI fragment 中的行号跳转
+  // 鐩戝惉鏂囨。鎵撳紑浜嬩欢锛屽鐞?URI fragment 涓殑琛屽彿璺宠浆
   const openEditorListener = vscode.window.onDidChangeActiveTextEditor(async (editor) => {
     if (!editor) {
       return;
@@ -238,11 +237,11 @@ export async function activate(context: vscode.ExtensionContext) {
     if (uri.scheme !== 'duo') {
       return;
     }
-    // 检查是否有 #L123 格式的 fragment
+    // 妫€鏌ユ槸鍚︽湁 #L123 鏍煎紡鐨?fragment
     const fragment = uri.fragment;
     const lineMatch = fragment.match(/^L(\d+)$/);
     if (lineMatch) {
-      const lineNum = parseInt(lineMatch[1], 10) - 1; // 转换为 0-based
+      const lineNum = parseInt(lineMatch[1], 10) - 1; // 杞崲涓?0-based
       if (lineNum >= 0 && lineNum < editor.document.lineCount) {
         const position = new vscode.Position(lineNum, 0);
         const range = new vscode.Range(position, position);
@@ -390,13 +389,13 @@ function getTimeAgo(date: Date): string {
   const diffDays = Math.floor(diffHours / 24);
 
   if (diffDays > 0) {
-    return `${diffDays} 天前`;
+    return `${diffDays} days ago`;
   } else if (diffHours > 0) {
-    return `${diffHours} 小时前`;
+    return `${diffHours} hours ago`;
   } else if (diffMins > 0) {
-    return `${diffMins} 分钟前`;
+    return `${diffMins} minutes ago`;
   } else {
-    return '刚刚';
+    return 'Just now';
   }
 }
 
@@ -519,3 +518,4 @@ export function deactivate() {
   console.log('Duo-SCP-Edit is now deactivated.');
   ConnectionManager.instance.disconnect().catch(() => {});
 }
+
