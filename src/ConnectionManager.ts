@@ -256,7 +256,7 @@ export class ConnectionManager {
         // 鍏抽敭淇锛氫笉鍦ㄨ繖閲岃缃?isConnected = false
         // end/close 浜嬩欢鍙兘鍦ㄥ崟涓?channel 鍏抽棴鏃惰瑙﹀彂
       }).on('close', () => {
-        // 鍚屼笂锛氬崟涓?channel 鍏抽棴涓嶅奖鍝嶆暣涓繛鎺ョ姸鎬?      }).connect({
+      }).connect({
         host: config.host,
         port: config.port,
         username: config.username,
@@ -468,7 +468,7 @@ export class ConnectionManager {
    * @param localDir 鏈湴鏂囦欢澶硅矾寰?   * @param remoteDir 杩滅▼鐩爣璺緞
    */
   private async uploadDirectory(localDir: string, remoteDir: string): Promise<void> {
-    // 鍏堝垱寤鸿繙绋嬬洰褰?    await this.createDirectory(remoteDir);
+    await this.createDirectory(remoteDir);
 
     // 璇诲彇鏈湴鐩綍鍐呭
     const entries = fs.readdirSync(localDir, { withFileTypes: true });

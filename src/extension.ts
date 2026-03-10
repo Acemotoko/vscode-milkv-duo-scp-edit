@@ -188,7 +188,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const localPath = uri.fsPath;
     const fileName = path.basename(localPath);
 
-    // 妫€鏌ヨ繛鎺ョ姸鎬?    if (!connectionManager.isConnected) {
+    if (!connectionManager.isConnected) {
       const connectChoice = await vscode.window.showWarningMessage(
         '鏈繛鎺ュ埌璁惧銆傝鍏堣繛鎺?Milk-V Duo 璁惧',
         '杩炴帴璁惧',

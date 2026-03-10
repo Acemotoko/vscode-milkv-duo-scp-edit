@@ -1,11 +1,10 @@
-import * as vscode from 'vscode';
+﻿import * as vscode from 'vscode';
 import { ConnectionManager, shellEscape } from './ConnectionManager';
 
 export const SEARCH_SCHEME = 'duo-search';
 
 /**
- * 搜索结果内容提供者 - 提供 duo-search:// 协议的文档内容
- */
+ * 鎼滅储缁撴灉鍐呭鎻愪緵鑰?- 鎻愪緵 duo-search:// 鍗忚鐨勬枃妗ｅ唴瀹? */
 export class DuoSearchContentProvider implements vscode.TextDocumentContentProvider {
   private readonly onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
   readonly onDidChange = this.onDidChangeEmitter.event;
@@ -27,7 +26,7 @@ export class DuoSearchContentProvider implements vscode.TextDocumentContentProvi
 }
 
 /**
- * 搜索结果链接提供者 - 让搜索结果中的文件路径可点击
+ * 鎼滅储缁撴灉閾炬帴鎻愪緵鑰?- 璁╂悳绱㈢粨鏋滀腑鐨勬枃浠惰矾寰勫彲鐐瑰嚮
  */
 export class DuoSearchLinkProvider implements vscode.DocumentLinkProvider {
   provideDocumentLinks(
@@ -37,8 +36,8 @@ export class DuoSearchLinkProvider implements vscode.DocumentLinkProvider {
     const links: vscode.DocumentLink[] = [];
     const text = document.getText();
 
-    // 正则匹配: 文件名路径（一行一个，以 / 开头）
-    // 格式: /path/to/file.txt
+    // 姝ｅ垯鍖归厤: 鏂囦欢鍚嶈矾寰勶紙涓€琛屼竴涓紝浠?/ 寮€澶达級
+    // 鏍煎紡: /path/to/file.txt
     const regex = /^(\/[^\s]+)$/gm;
     let match: RegExpExecArray | null;
 
@@ -50,17 +49,16 @@ export class DuoSearchLinkProvider implements vscode.DocumentLinkProvider {
       const filePath = match[1];
       const fullMatch = match[0];
 
-      // 跳过调试信息行
       if (fullMatch.includes('===') || fullMatch.includes('Step') || fullMatch.includes('Command') || fullMatch.includes('Starting')) {
         continue;
       }
 
-      // 计算链接范围
+      // 璁＄畻閾炬帴鑼冨洿
       const startPos = document.positionAt(match.index);
       const endPos = document.positionAt(match.index + fullMatch.length);
       const range = new vscode.Range(startPos, endPos);
 
-      // 构建目标 URI - duo:// 协议
+      // 鏋勫缓鐩爣 URI - duo:// 鍗忚
       const targetUri = vscode.Uri.parse(`duo://${filePath}`);
 
       const link = new vscode.DocumentLink(range, targetUri);
@@ -73,20 +71,16 @@ export class DuoSearchLinkProvider implements vscode.DocumentLinkProvider {
 }
 
 /**
- * 构建全盘文件名搜索命令
- */
+ * 鏋勫缓鍏ㄧ洏鏂囦欢鍚嶆悳绱㈠懡浠? */
 function buildFileNameSearchCommand(term: string): string {
-  // 安全转义：使用导入的 shellEscape 函数，但需要去掉首尾单引号
-  // 因为 find 命令中需要用 * 通配符
+  // 瀹夊叏杞箟锛氫娇鐢ㄥ鍏ョ殑 shellEscape 鍑芥暟锛屼絾闇€瑕佸幓鎺夐灏惧崟寮曞彿
   const safeTerm = shellEscape(term).slice(1, -1);
 
-  // 构建命令：使用 -prune 排除危险目录，-iname 忽略大小写
   return `find / \\( -path /proc -o -path /sys -o -path /dev -o -path /run -o -path /tmp \\) -prune -o -iname '*${safeTerm}*' -print 2>/dev/null`;
 }
 
 /**
- * 执行搜索命令 - 只搜文件名版本
- */
+ * 鎵ц鎼滅储鍛戒护 - 鍙悳鏂囦欢鍚嶇増鏈? */
 export async function executeSearch(
   connectionManager: ConnectionManager,
   contentProvider: DuoSearchContentProvider
@@ -105,7 +99,6 @@ export async function executeSearch(
     }
   }
 
-  // 获取搜索词
   const searchTerm = await vscode.window.showInputBox({
     prompt: 'Enter filename to search (wildcard * supported)',
     placeHolder: 'Search filename (e.g., config.json, *.c)',
@@ -116,7 +109,6 @@ export async function executeSearch(
     return;
   }
 
-  // 执行搜索并显示进度
   await vscode.window.withProgress({
     location: vscode.ProgressLocation.Notification,
     title: `Searching filename "${searchTerm}"...`,
@@ -134,7 +126,7 @@ export async function executeSearch(
     try {
       addDebug(`Starting filename search for "${searchTerm}"`);
 
-      // ========== 第一步：测试连接 ==========
+      // ========== 绗竴姝ワ細娴嬭瘯杩炴帴 ==========
       addDebug('Step 1: Testing connection...');
       try {
         const pwdOutput = await connectionManager.execCommand('pwd');
@@ -143,13 +135,13 @@ export async function executeSearch(
         addDebug(`pwd failed: ${e}`);
       }
 
-      // ========== 第二步：构建 find 命令（只搜文件名）==========
+      // ========== 绗簩姝ワ細鏋勫缓 find 鍛戒护锛堝彧鎼滄枃浠跺悕锛?=========
       addDebug('Step 2: Building find command...');
 
       const command = buildFileNameSearchCommand(searchTerm);
       addDebug(`Command: ${command}`);
 
-      // ========== 第三步：执行搜索（30秒超时）==========
+      // ========== 绗笁姝ワ細鎵ц鎼滅储锛?0绉掕秴鏃讹級==========
       addDebug('Step 3: Executing find (timeout: 30s)...');
 
       const searchPromise = connectionManager.execCommand(command);
@@ -157,7 +149,7 @@ export async function executeSearch(
         setTimeout(() => reject(new Error('SEARCH_TIMEOUT')), 30000);
       });
 
-      // 监听取消
+      // 鐩戝惉鍙栨秷
       let cancelDisposable: vscode.Disposable | undefined;
       cancelDisposable = token.onCancellationRequested(() => {
         addDebug('Search cancelled by user');
@@ -169,7 +161,7 @@ export async function executeSearch(
       } catch (err: any) {
         if (err.message === 'SEARCH_TIMEOUT') {
           timedOut = true;
-          addDebug('⏱️  Search timed out after 30 seconds');
+          addDebug('鈴憋笍  Search timed out after 30 seconds');
         } else {
           addDebug(`Search error: ${err.message}`);
           throw err;
@@ -178,7 +170,7 @@ export async function executeSearch(
         cancelDisposable?.dispose();
       }
 
-      // ========== 第四步：准备显示内容 ==========
+      // ========== 绗洓姝ワ細鍑嗗鏄剧ず鍐呭 ==========
       addDebug('Step 4: Preparing results...');
 
       let displayContent = `=== Duo Filename Search ===\n`;
@@ -187,7 +179,7 @@ export async function executeSearch(
 
       if (timedOut) {
         displayContent += `Filename search for "${searchTerm}"\n\n`;
-        displayContent += `⏱️  Search timed out after 30 seconds.\n\n`;
+        displayContent += `鈴憋笍  Search timed out after 30 seconds.\n\n`;
         if (output && output.trim()) {
           const lines = output.split('\n').filter(line => line.trim() !== '');
           displayContent += `Partial results (${lines.length} files):\n\n`;
@@ -202,7 +194,7 @@ export async function executeSearch(
         displayContent += output;
       }
 
-      // ========== 第五步：显示结果 ==========
+      // ========== 绗簲姝ワ細鏄剧ず缁撴灉 ==========
       addDebug('Step 5: Displaying results...');
 
       const resultUri = vscode.Uri.parse(`${SEARCH_SCHEME}:/Filename%20Search?${encodeURIComponent(searchTerm)}`);
@@ -217,7 +209,6 @@ export async function executeSearch(
       const errorMsg = `Search failed: ${err.message}`;
       addDebug(errorMsg);
 
-      // 即使出错也显示调试信息
       const resultUri = vscode.Uri.parse(`${SEARCH_SCHEME}:/Filename%20Search?error`);
       const errorContent = `=== Duo Search Error ===\n\n${debugInfo}\n\nError: ${err.message}\n`;
       contentProvider.update(resultUri, errorContent);

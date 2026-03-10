@@ -61,10 +61,10 @@ export class DuoFileSystemProvider implements vscode.FileSystemProvider {
    * 娓呴櫎鎸囧畾璺緞鐨勭紦瀛橈紙鍖呮嫭瀛愯矾寰勶級
    */
   private invalidateCache(path: string): void {
-    // 娓呴櫎璇ヨ矾寰勭殑鐖剁洰褰曠紦瀛?    const parentPath = path.substring(0, path.lastIndexOf('/')) || '/';
+    const parentPath = path.substring(0, path.lastIndexOf('/')) || '/';
     this.directoryCache.delete(parentPath);
 
-    // 娓呴櫎鎵€鏈変互璇ヨ矾寰勫紑澶寸殑缂撳瓨锛堝瓙鐩綍锛?    for (const key of this.directoryCache.keys()) {
+    for (const key of this.directoryCache.keys()) {
       if (key.startsWith(path)) {
         this.directoryCache.delete(key);
       }
@@ -127,7 +127,7 @@ export class DuoFileSystemProvider implements vscode.FileSystemProvider {
     const remotePath = uri.path || '/';
     const now = Date.now();
 
-    // 妫€鏌ョ紦瀛樻槸鍚﹀懡涓笖鏈繃鏈?    const cached = this.directoryCache.get(remotePath);
+    const cached = this.directoryCache.get(remotePath);
     if (cached && (now - cached.timestamp) < this.CACHE_TTL) {
       return cached.entries;
     }
